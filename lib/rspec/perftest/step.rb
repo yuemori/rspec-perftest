@@ -1,6 +1,8 @@
 module RSpec
   module Perftest
     class Step
+      attr_reader :name
+
       def initialize(name, options, block)
         @name = name
         @options = options

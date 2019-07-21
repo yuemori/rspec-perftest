@@ -10,7 +10,10 @@ module RSpec
       base.class_eval do
         it 'benchmark' do
           self.class.steps.each do |step|
-            expect(step.benchmark.real).to be < step.limit
+            result = step.benchmark
+            RSpec.configuration.reporter.publish :benchmark, benchmark: result, step: step
+
+            expect(result.real).to be < step.limit
           end
         end
       end
