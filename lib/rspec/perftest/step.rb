@@ -13,12 +13,28 @@ module RSpec
         @options[:limit] || Float::INFINITY
       end
 
+      def warmup_times
+        @options[:warmup_times] || 5
+      end
+
+      def benchmark_times
+        @options[:benchmark_times] || 10
+      end
+
       def benchmark
-        with_gc_stats do
-          measure do
-            @block.call
+        warmup_times.times { @block.call }
+
+        result = Benchmark::Tms.new
+
+        benchmark_times.times do
+          with_gc_stats do
+            result += measure do
+              @block.call
+            end
           end
         end
+
+        result / benchmark_times
       end
 
       private
