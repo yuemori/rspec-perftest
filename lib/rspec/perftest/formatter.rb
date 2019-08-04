@@ -5,28 +5,59 @@ require 'terminal-table'
 module RSpec
   module Perftest
     class Formatter < RSpec::Core::Formatters::DocumentationFormatter
-      RSpec::Core::Formatters.register self, :benchmark, :example_passed
+      RSpec::Core::Formatters.register self, :benchmark, :stackprof, :example_passed
 
       def benchmark(notification)
-        result = notification.benchmark
+        rows << :benchmark if rows.empty?
+
+        result = notification.benchmark_result
         step = notification.step
 
         row = [step.name, result.utime, result.stime, result.total, result.real]
         rows << row
       end
 
-      def example_passed(_notification)
-        table = Terminal::Table.new(
-          rows: rows,
-          headings: %w[name user system total real]
+      def stackprof(notification)
+        rows << :stackprof if rows.empty?
+
+        report = StringIO.new
+
+        StackProf::Report.new(notification.stackprof_result).print_text(
+          false, # sort_by_total
+          10, # limit
+          nil, # select_files
+          nil, # reject_files
+          nil, # select_names
+          nil, # reject_names
+          report # f
         )
 
-        table.align_column(1, :right)
+        report.rewind
+
+        rows << [notification.step.name, report.read]
+      end
+
+      def example_passed(_notification)
+        type = rows.first
+
+        heading = case type
+                  when :stackprof
+                    %w[name, profile]
+                  when :benchmark
+                    %w[name user system total real]
+                  end
+
+        table = Terminal::Table.new(
+          rows: rows[1..-1],
+          headings: heading
+        )
+        table.style = { all_separators: true }
 
         out = table.to_s.split("\n").map do |line|
           current_indentation + line
-        end.join("\n")
+        end.join("\n") + "\n\n"
 
+        output.write RSpec::Core::Formatters::ConsoleCodes.wrap("#{type}\n", :success)
         output.write RSpec::Core::Formatters::ConsoleCodes.wrap(out, :success)
       ensure
         rows.clear

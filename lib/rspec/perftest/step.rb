@@ -21,20 +21,51 @@ module RSpec
         @options[:benchmark_times] || 10
       end
 
-      def benchmark
-        warmup_times.times { @block.call }
+      def mode
+        @options[:mode] || :cpu
+      end
+
+      def base_path
+        @options[:base_path] || Pathname.new(Dir.pwd).join("tmp")
+      end
+
+      def benchmark(context)
+        warmup_times.times { context.instance_eval(&@block) }
 
         result = Benchmark::Tms.new
 
         benchmark_times.times do
           with_gc_stats do
             result += measure do
-              @block.call
+              context.instance_eval(&@block)
             end
           end
         end
 
         result / benchmark_times
+      end
+
+      def stackprof_interval
+        @options[:stackprof_interval] || 100
+      end
+
+      def stackprof_dir
+        base_path.join("stackprof")
+      end
+
+      def stackprof_out
+        stackprof_dir.join("#{name}.dump")
+      end
+
+      def stackprof(context)
+        FileUtils.mkdir_p stackprof_dir.to_s
+
+        with_gc_stats do
+          StackProf.start(mode: mode, raw: true, interval: stackprof_interval)
+          context.instance_eval(&@block)
+          StackProf.stop
+          StackProf.results
+        end
       end
 
       private

@@ -24,6 +24,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "rspec", "~> 3.0"
   spec.add_dependency "terminal-table"
+  spec.add_dependency "stackprof"
 
   spec.add_development_dependency "bundler"
   spec.add_development_dependency "rake", "~> 10.0"
