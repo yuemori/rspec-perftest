@@ -37,12 +37,12 @@ module RSpec
         rows << [notification.step.name, report.read]
       end
 
-      def example_passed(_notification)
+      def example_passed(_notification) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
         type = rows.first
 
         heading = case type
                   when :stackprof
-                    %w[name, profile]
+                    %w[name profile]
                   when :benchmark
                     %w[name user system total real]
                   end

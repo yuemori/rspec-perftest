@@ -5,7 +5,7 @@ require "stackprof"
 
 module RSpec
   module Perftest
-    def self.included(base)
+    def self.included(base) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
       base.extend ClassMethods
 
       base.class_eval do

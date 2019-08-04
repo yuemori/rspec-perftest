@@ -1,4 +1,3 @@
-# coding: utf-8
 lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require "rspec/perftest/version"
@@ -9,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ["yuemori"]
   spec.email         = ["yuemori@aiming-inc.com"]
 
-  spec.summary       = %q{Benchmark and profile your apps with rspec.}
-  spec.description   = %q{Benchmark and profile your apps with rspec.}
+  spec.summary       = "Benchmark and profile your apps with rspec."
+  spec.description   = "Benchmark and profile your apps with rspec."
   spec.homepage      = "https://github.com/yuemori/rspec-perftest"
   spec.license       = "MIT"
 
@@ -30,4 +29,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "rspec", "~> 3.0"
   spec.add_development_dependency "pry-byebug"
+  spec.add_development_dependency "rubocop"
+  spec.add_development_dependency "rubocop-performance"
 end
